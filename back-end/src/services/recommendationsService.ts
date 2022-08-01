@@ -16,13 +16,19 @@ async function insert(createRecommendationData: CreateRecommendationData) {
 }
 
 async function upvote(id: number) {
+  // const recommendation = await recommendationRepository.find(id);
+  // if (!recommendation) throw notFoundError();
+
   await getByIdOrFail(id);
 
   await recommendationRepository.updateScore(id, "increment");
 }
 
 async function downvote(id: number) {
-  await getByIdOrFail(id);
+  const recommendation = await recommendationRepository.find(id);
+  if (!recommendation) throw notFoundError();
+
+  // await getByIdOrFail(id);
 
   const updatedRecommendation = await recommendationRepository.updateScore(
     id,
@@ -30,11 +36,13 @@ async function downvote(id: number) {
   );
 
   if (updatedRecommendation.score < -5) {
+    console.log("ENTROU");
     await recommendationRepository.remove(id);
   }
 }
 
 async function getByIdOrFail(id: number) {
+  //TODO: como fazer mock aqui?
   const recommendation = await recommendationRepository.find(id);
   if (!recommendation) throw notFoundError();
 
